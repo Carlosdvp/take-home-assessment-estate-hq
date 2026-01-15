@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { FixedSizeList } from 'react-window';
 import { useData } from '../state/DataContext';
 import { Link } from 'react-router-dom';
 
@@ -44,6 +45,15 @@ function Items() {
     }
   };
 
+  const Row = ({ index, style }) => {
+    const item = items[index];
+    return (
+      <div style={style}>
+        <Link to={'/items/' + item.id}>{item.name}</Link>
+      </div>
+    );
+  };
+
   return (
     <div>
       <div style={{ marginBottom: '20px' }}>
@@ -60,13 +70,14 @@ function Items() {
         <p>No items found</p>
       ) : (
         <>
-          <ul>
-            {items.map(item => (
-              <li key={item.id}>
-                <Link to={'/items/' + item.id}>{item.name}</Link>
-              </li>
-            ))}
-          </ul>
+          <FixedSizeList
+            height={600}
+            itemCount={items.length}
+            itemSize={50}
+            width="100%"
+          >
+            {Row}
+          </FixedSizeList>
 
           <div style={{ marginTop: '20px' }}>
             <button onClick={handlePrevious} disabled={page === 1}>
