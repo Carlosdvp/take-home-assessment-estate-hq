@@ -1,19 +1,22 @@
-import React, { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useData } from '../state/DataContext';
 import { Link } from 'react-router-dom';
 
 function Items() {
   const { items, fetchItems } = useData();
+  const active = useRef(true);
 
   useEffect(() => {
-    let active = true;
+    active.current = true;
 
-    // Intentional bug: setState called after component unmount if request is slow
-    fetchItems().catch(console.error);
+    fetchItems(() => active.current).catch((err) => {
+      if (active.current) {
+        console.error(err);
+      }
+    });
 
-    // Clean‑up to avoid memory leak (candidate should implement)
     return () => {
-      active = false;
+      active.current = false;
     };
   }, [fetchItems]);
 
