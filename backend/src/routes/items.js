@@ -1,6 +1,7 @@
 const express = require('express');
 const fs = require('fs').promises;
 const path = require('path');
+const { invalidateStatsCache } = require('./stats');
 const router = express.Router();
 const DATA_PATH = path.join(__dirname, '../../../data/items.json');
 
@@ -54,6 +55,7 @@ router.post('/', async (req, res, next) => {
     item.id = Date.now();
     data.push(item);
     await fs.writeFile(DATA_PATH, JSON.stringify(data, null, 2));
+    invalidateStatsCache();
     res.status(201).json(item);
   } catch (err) {
     next(err);
