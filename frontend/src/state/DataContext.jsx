@@ -8,6 +8,7 @@ export function DataProvider({ children }) {
   const [limit, setLimit] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const fetchItems = useCallback(async (shouldUpdate, options = {}) => {
     const currentPage = options.page || page;
@@ -23,16 +24,23 @@ export function DataProvider({ children }) {
       params.append('q', currentSearch);
     }
 
-    const res = await fetch(`http://localhost:4001/api/items?${params}`);
-    const json = await res.json();
+    setLoading(true);
+    try {
+      const res = await fetch(`http://localhost:4001/api/items?${params}`);
+      const json = await res.json();
 
-    if (!shouldUpdate || shouldUpdate()) {
-      setItems(json.items || json);
-      setTotalItems(json.total || 0);
-      setPage(json.page || currentPage);
-      setLimit(json.limit || currentLimit);
+      if (!shouldUpdate || shouldUpdate()) {
+        setItems(json.items || json);
+        setTotalItems(json.total || 0);
+        setPage(json.page || currentPage);
+        setLimit(json.limit || currentLimit);
+      }
+      return json;
+    } finally {
+      if (!shouldUpdate || shouldUpdate()) {
+        setLoading(false);
+      }
     }
-    return json;
   }, [page, limit, searchQuery]);
 
   return (
@@ -42,6 +50,7 @@ export function DataProvider({ children }) {
       limit,
       totalItems,
       searchQuery,
+      loading,
       fetchItems,
       setPage,
       setLimit,

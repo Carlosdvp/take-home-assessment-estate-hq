@@ -4,7 +4,7 @@ import { useData } from '../state/DataContext';
 import { Link } from 'react-router-dom';
 
 function Items() {
-  const { items, fetchItems, page, setPage, totalItems, searchQuery, setSearchQuery } = useData();
+  const { items, fetchItems, page, setPage, totalItems, searchQuery, setSearchQuery, loading } = useData();
   const active = useRef(true);
 
   useEffect(() => {
@@ -66,7 +66,9 @@ function Items() {
         />
       </div>
 
-      {!items.length ? (
+      {loading ? (
+        <p>Loading...</p>
+      ) : !items.length ? (
         <p>No items found</p>
       ) : (
         <>
@@ -80,13 +82,13 @@ function Items() {
           </FixedSizeList>
 
           <div style={{ marginTop: '20px' }}>
-            <button onClick={handlePrevious} disabled={page === 1}>
+            <button onClick={handlePrevious} disabled={page === 1 || loading}>
               Previous
             </button>
             <span style={{ margin: '0 15px' }}>
               Page {page} of {Math.ceil(totalItems / 10)} ({totalItems} total items)
             </span>
-            <button onClick={handleNext} disabled={page >= Math.ceil(totalItems / 10)}>
+            <button onClick={handleNext} disabled={page >= Math.ceil(totalItems / 10) || loading}>
               Next
             </button>
           </div>
